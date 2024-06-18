@@ -3,10 +3,13 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib import auth
+from .models import Book
+from django.http import JsonResponse
 
 
 def home(request):
-    context = {}
+    books = Book.objects.all()
+    context = {'books': books}
     if request.user.is_authenticated:
         context['userStatus'] = 'logged in'
     else:
@@ -50,3 +53,9 @@ def logout_page(request):
     if request.method == 'POST':
         auth.logout(request)
         return redirect('home_page')
+
+
+def get_raiting(request):
+    # data = list(Book.objects.values_list('id', 'average_rating'))
+    data = list(Book.objects.values())
+    return JsonResponse({'data': list(data)})
