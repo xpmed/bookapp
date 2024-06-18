@@ -3,13 +3,24 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib import auth
-from .models import Book
+from .models import Book, Category, Review
 from django.http import JsonResponse
+from django.db.models import Q
+from django.http import HttpResponse, HttpResponseNotFound
 
 
 def home(request):
     books = Book.objects.all()
-    context = {'books': books}
+    categories = Category.objects.all()
+    context = {
+        'books': books,
+        'categories': categories,
+    }
+    if 'search_button' in request.POST:
+        search = request.POST.get('search_value')
+        searched_books = books.filter(Q(title__contains=search) | Q(author__name__contains=search) | Q(author__surname__contains=search) | Q(category__category=search))
+        context['books'] = searched_books
+        context['searched'] = search
     if request.user.is_authenticated:
         context['userStatus'] = 'logged in'
     else:
@@ -59,3 +70,16 @@ def get_raiting(request):
     # data = list(Book.objects.values_list('id', 'average_rating'))
     data = list(Book.objects.values())
     return JsonResponse({'data': list(data)})
+
+
+def detail_view(request, id):
+    context = {}
+    try:
+        obj = Book.objects.get(id=id)
+        reviews = Review.objects.filter(book__id=id)
+        context['obj'] = obj
+        context['reviews'] = reviews
+        return render(request, 'mainpage/detail.html', context)
+    except:
+        return HttpResponseNotFound("Not Found")
+

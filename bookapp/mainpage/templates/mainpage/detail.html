@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'mainpage/base.html' %}
+    {% block content %}
+        <div class="col-lg-8 mx-auto" id="book-{{ book.id }}">
+            <ul class="list-group shadow">
+                <li class="list-group-item">
+                    <div class="media align-items-lg-center flex-column flex-lg-row p-3">
+                        <img src="{{ obj.cover.url }}" alt="{{ obj.title }}" width="300" class="ml-lg-5 order-1 order-lg-2">
+                        <div class="media-body order-2 order-lg-1">
+                            <h2 class="mt-0 font-weight-bold mb-2">{{ obj.title }}
+                            <i class="fa fa-star" style="font-size:25px;color:orange"></i>
+                                    <b id="average-rating-{{ book.id }}" style="color:orange;">{% firstof obj.average_rating '?' %}</b> / 10</h2>
+                            <p class="font-italic mb-5">{{ obj.description }}</p>
+                            <h4 class="font-weight-bold my-2">{{ obj.author }}</h4>
+                            <p class="font-italic mb-10">{{ obj.author.description }}</p>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    {{ reviews }}
+                </li>
+            </ul>
+        </div>
+    {% endblock %}
+</body>
+</html>

@@ -10,68 +10,90 @@
     {% block content %}
     <script>
         $(document).ready(function() {
-        function fetchAndUpdateObjects() {
-            $.ajax({
-                type: 'GET',
-                url: '{% url 'get_raiting' %}',
-                success: function(response) {
-                    for (var key in response.data) {
-                        var x = parseInt(key) + 1;
-                        var rate_id = '#average-rating-' + x;
-                        var the_rate = $(rate_id).html();
-                        var book_id = '#book-' + x;
-                        var book_div = $(book_id).html();
-                        if (book_div && response.data[key].average_rating) {
-                            if (the_rate != response.data[key].average_rating) {
-                                $(rate_id).text(response.data[key].average_rating);
+            function fetchAndUpdateObjects() {
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'get_raiting' %}',
+                    success: function(response) {
+                        for (var key in response.data) {
+                            var x = parseInt(key) + 1;
+                            var rate_id = '#average-rating-' + x;
+                            var the_rate = $(rate_id).html();
+                            var book_id = '#book-' + x;
+                            var book_div = $(book_id).html();
+                            if (book_div && response.data[key].average_rating) {
+                                if (the_rate != response.data[key].average_rating) {
+                                    $(rate_id).text(response.data[key].average_rating);
+                                }
                             }
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error AJAX: ' + error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error AJAX: ' + error);
-                }
-            });
+                });
+            }
+            setInterval(fetchAndUpdateObjects, 15000);
+        });
+
+        function selectCategory(category) {
+            document.getElementById('example-search-input').value = category;
+            var post_button = document.getElementById('search_button');
+            post_button.click();
         }
-        setInterval(fetchAndUpdateObjects, 3000);
-    });
     </script>
-         <div class="input-group col-lg-8 mx-auto p-3 mb-3">
-            <input class="form-control border-end-0 border rounded-pill mr-2" type="text" placeholder="search" value="" id="example-search-input">
+    <form action="" method="post">
+    {% csrf_token %}
+    <div class="d-flex align-items-center col-lg-8 mx-auto p-3 mb-3">
+         <div class="dropdown mr-3">
+            <button class="btn btn-secondary dropdown-toggle" style="background-color:#28a745;" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Search Category
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for c in categories %}
+                    <span class="dropdown-item" onclick="selectCategory('{{ c }}')">{{ c }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="input-group me-3">
+            <input class="form-control border-end-0 border rounded-pill mr-2" type="text" placeholder="Search" value="{{ searched }}" id="example-search-input"  name="search_value">
             <span class="input-group-append">
-                <button class="btn btn-outline-secondary bg-white border-start-0 border rounded-pill ms-n3" type="button">
+                <button class="btn btn-outline-secondary bg-white border-start-0 border rounded-pill ms-n3" type="submit" name="search_button" value="search" id="search_button">
                     <i class="fa fa-search text-success"></i>
                 </button>
             </span>
-     </div>
+        </div>
+    </div>
+</form>
 
     <div class="row">
         {% for book in books %}
             <div class="col-lg-8 mx-auto" id="book-{{ book.id }}">
                 <ul class="list-group shadow">
                     <li class="list-group-item">
-                        <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                            <img src="{{ book.cover.url }}" alt="{{ book.title }}" width="200" class="ml-lg-5 order-1 order-lg-2">
-                            <div class="media-body order-2 order-lg-1">
-                                <h5 class="mt-0 font-weight-bold mb-2">{{ book.title }}</h5>
-                                <h6 class="font-weight-bold my-2">{{ book.author }}</h6>
-                                <p class="font-italic text-muted mb-0 small">{{ book.s_description }}</p>
-                                <div class="d-flex align-items-center justify-content-between mt-1">
-                                    <h6 class="font-weight-bold my-2">
-                                        <i class="fa fa-star" style="font-size:25px;color:orange"></i>
-                                        <b id="average-rating-{{ book.id }}" style="color:orange;">{% firstof book.average_rating '?' %}</b> / 10
-                                   </h6>
+                        <a href="{% url 'detail_view' book.id %}" style="text-decoration: none; color: black;">
+                            <div class="media align-items-lg-center flex-column flex-lg-row p-3">
+                                <img src="{{ book.cover.url }}" alt="{{ book.title }}" width="200" class="ml-lg-5 order-1 order-lg-2">
+                                <div class="media-body order-2 order-lg-1">
+                                    <h5 class="mt-0 font-weight-bold mb-2">{{ book.title }}</h5>
+                                    <h6 class="font-weight-bold my-2">{{ book.author }}</h6>
+                                    <p class="font-italic text-muted mb-0 small">{{ book.s_description }}</p>
+                                    <div class="d-flex align-items-center justify-content-between mt-1">
+                                        <h6 class="font-weight-bold my-2">
+                                            <i class="fa fa-star" style="font-size:25px;color:orange"></i>
+                                            <b id="average-rating-{{ book.id }}" style="color:orange;">{% firstof book.average_rating '?' %}</b> / 10
+                                       </h6>
+                                    </div>
                                 </div>
                             </div>
-                        </div> <!-- End -->
-                    </li> <!-- End -->
+                        </a>
+                    </li>
                 </ul>
             </div>
         {% endfor %}
     </div>
 </div>
     {% endblock %}
-
 </body>
 </html>
 
