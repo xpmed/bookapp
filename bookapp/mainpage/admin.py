@@ -15,8 +15,14 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        'book_title',
+        'raiting',
+        'author',
+    ]
 
+    def book_title(self, obj):
+        return obj.book.title
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):

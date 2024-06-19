@@ -3,10 +3,14 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib import auth
+from django.template.loader import render_to_string
+
 from .models import Book, Category, Review
 from django.http import JsonResponse
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound
+from .forms import ReviewForm
+from django.template.context_processors import csrf
 
 
 def home(request):
@@ -71,15 +75,42 @@ def get_raiting(request):
     data = list(Book.objects.values())
     return JsonResponse({'data': list(data)})
 
-
 def detail_view(request, id):
     context = {}
-    try:
-        obj = Book.objects.get(id=id)
+    # try:
+    obj = Book.objects.get(id=id)
+    reviews = Review.objects.filter(book__id=id)
+    context['obj'] = obj
+    if request.POST:
+        rate = request.POST.get('rateValue', None)
+        content = request.POST.get('contentValue', None)
+        Review.objects.create(
+            book=obj,
+            content=content,
+            raiting=rate,
+            author=request.user,
+        )
+        if obj.average_rating:
+            latest_rate = obj.average_rating
+            av_rate = (latest_rate + rate) / 2
+        else:
+            av_rate = rate
+        obj.average_rating = av_rate
+        obj.save()
         reviews = Review.objects.filter(book__id=id)
-        context['obj'] = obj
         context['reviews'] = reviews
         return render(request, 'mainpage/detail.html', context)
-    except:
-        return HttpResponseNotFound("Not Found")
+    context['reviews'] = reviews
+    return render(request, 'mainpage/detail.html', context)
+    # except:
+    #     return HttpResponseNotFound("Not Found")
 
+
+def get_reviews(request, id):
+    data = list(Review.objects.filter(book__id=id).values())
+    return JsonResponse({'data': list(data)})
+
+
+def get_rating_s(request, id):
+    data = Book.objects.filter(id=id)
+    return JsonResponse({'average_rate': data[0].average_rating})
