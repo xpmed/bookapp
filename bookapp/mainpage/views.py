@@ -7,6 +7,7 @@ from .models import Book, Category, Review
 from django.http import JsonResponse
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound
+from .forms import ReviewForm
 
 
 def home(request):
@@ -74,12 +75,19 @@ def get_raiting(request):
 
 def detail_view(request, id):
     context = {}
-    try:
-        obj = Book.objects.get(id=id)
-        reviews = Review.objects.filter(book__id=id)
-        context['obj'] = obj
-        context['reviews'] = reviews
-        return render(request, 'mainpage/detail.html', context)
-    except:
-        return HttpResponseNotFound("Not Found")
+    # try:
+    obj = Book.objects.get(id=id)
+    reviews = Review.objects.filter(book__id=id)
+    form = ReviewForm(request.POST)
+    context['obj'] = obj
+    context['reviews'] = reviews
+    context['form'] = form
+
+    if 'add_review' in request.POST:
+        rate = request.POST.get('rating')
+        content = request.POST.get('content')
+
+    return render(request, 'mainpage/detail.html', context)
+    # except:
+    #     return HttpResponseNotFound("Not Found")
 
