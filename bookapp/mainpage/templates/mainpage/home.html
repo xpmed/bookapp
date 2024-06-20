@@ -73,7 +73,11 @@
                     <li class="list-group-item">
                         <a href="{% url 'detail_view' book.id %}" style="text-decoration: none; color: black;">
                             <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                                <img src="{{ book.cover.url }}" alt="{{ book.title }}" width="200" class="ml-lg-5 order-1 order-lg-2">
+                                {% if book.cover %}
+                                    <img src="{{ book.cover.url }}" alt="{{ book.title }}" width="200" class="ml-lg-5 order-1 order-lg-2">
+                                {% else %}
+                                    <img src="" alt="{{ book.title }}" width="200" class="ml-lg-5 order-1 order-lg-2">
+                                {% endif %}
                                 <div class="media-body order-2 order-lg-1">
                                     <h5 class="mt-0 font-weight-bold mb-2">{{ book.title }}</h5>
                                     <h6 class="font-weight-bold my-2">{{ book.author }}</h6>

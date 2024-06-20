@@ -25,7 +25,7 @@ class Book(models.Model):
     title = models.CharField(max_length=100, blank=True, null=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, blank=True, null=True)
     description = models.TextField(max_length=1000, blank=True, null=True)
-    s_description = models.TextField(max_length=500, blank=True, null=True)
+    s_description = models.TextField(max_length=500, blank=True, null=True, verbose_name="short description")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
     cover = models.ImageField(upload_to='media/images/', blank=True, null=True)
     average_rating = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add a book</title>
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+        }
+        .form-container .form-group {
+            margin-bottom: 20px;
+        }
+        .form-container input[type="text"],
+        .form-container textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .form-container button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    {% extends 'mainpage/base.html' %}
+    {% block content %}
+         <div class="col-lg-8 mx-auto mb-5">
+            <ul class="list-group shadow">
+                <li class="list-group-item">
+                    <div class="container">
+        <div class="form-container">
+            <h2>Add a book</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }} <!-- Wyświetl formularz używając as_p dla prostego układu wierszowy -->
+                <button type="submit" class="btn btn-primary">Dodaj książkę</button>
+            </form>
+        </div>
+    </div>
+
+                </li>
+            </ul>
+         </div>
+    {% endblock %}
+</body>
+</html>

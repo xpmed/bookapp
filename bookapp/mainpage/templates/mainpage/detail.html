@@ -73,6 +73,9 @@
             font-size: 20px;
             z-index: 2;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -94,18 +97,41 @@
                     },
                     success: function(response) {
                         $('#myForm')[0].reset();
+                        $('#myForm').addClass('hidden');
+                        $('#new_review').removeClass('hidden');
+                        $("#new_rate").text(rateValue);
+                        $("#new_content").text(contentValue);
                     },
                 });
             });
-        });8
+        });
+
+        $(document).ready(function() {
+            function fetchAndUpdateObjects() {
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'get_rating_s' obj.id %}',
+                    success: function(response) {
+                        var the_rate = $("#average-rating").html();
+                        if (the_rate != response.average_rate) {
+                            $("#average-rating").text(response.average_rate);
+                        }
+                    },
+                });
+            }
+            setInterval(fetchAndUpdateObjects, 3000);
+        });
 
     </script>
-
         <div class="col-lg-8 mx-auto mb-5">
             <ul class="list-group shadow">
                 <li class="list-group-item">
                     <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                        <img src="{{ obj.cover.url }}" alt="{{ obj.title }}" width="300" class="ml-lg-5 order-1 order-lg-2">
+                        {% if book.cover %}
+                            <img src="{{ obj.cover.url }}" alt="{{ obj.title }}" width="300" class="ml-lg-5 order-1 order-lg-2">
+                        {% else %}
+                            <img src="" alt="{{ obj.title }}" width="200" class="ml-lg-5 order-1 order-lg-2">
+                        {% endif %}
                         <div class="media-body order-2 order-lg-1">
                             <h2 class="mt-0 font-weight-bold mb-2">{{ obj.title }}
                             <i class="fa fa-star" style="font-size:25px;color:orange"></i>
@@ -156,6 +182,17 @@
                             </div>
                         </div>
                     </form>
+                    <div id="new_review" class="hidden">
+                        <div class="media align-items-lg-center">
+                            <div class="media-body order-2 order-lg-1">
+                                <h6 class="mt-0 font-weight-bold mb-2">{{ user }}
+                                <i class="fa fa-star" style="font-size:20px;color:orange"></i>
+                                        <b id="new_rate" style="color:orange;"></b> / 10</h6>
+                                <p class="mb-3 text-muted">just now</p>
+                                <h6 id="new_content" class="font-italic mb-1"></h6>
+                            </div>
+                        </div>
+                    </div>
                 </li>
 
                 {% if reviews %}

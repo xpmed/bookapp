@@ -9,8 +9,10 @@ from .models import Book, Category, Review
 from django.http import JsonResponse
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound
-from .forms import ReviewForm
+from .forms import BookForm
 from django.template.context_processors import csrf
+from decimal import Decimal
+from django.http import HttpResponseForbidden
 
 
 def home(request):
@@ -77,33 +79,29 @@ def get_raiting(request):
 
 def detail_view(request, id):
     context = {}
-    # try:
-    obj = Book.objects.get(id=id)
+    obj = Book.objects.filter(id=id)
     reviews = Review.objects.filter(book__id=id)
-    context['obj'] = obj
+    context['obj'] = obj[0]
+    context['reviews'] = reviews
     if request.POST:
         rate = request.POST.get('rateValue', None)
         content = request.POST.get('contentValue', None)
         Review.objects.create(
-            book=obj,
+            book=obj[0],
             content=content,
             raiting=rate,
             author=request.user,
         )
-        if obj.average_rating:
-            latest_rate = obj.average_rating
-            av_rate = (latest_rate + rate) / 2
+        if obj[0].average_rating:
+            latest_rate = obj[0].average_rating
+            av_rate = (latest_rate + Decimal(rate)) / 2
         else:
             av_rate = rate
-        obj.average_rating = av_rate
-        obj.save()
+        obj.update(average_rating=av_rate)
         reviews = Review.objects.filter(book__id=id)
         context['reviews'] = reviews
         return render(request, 'mainpage/detail.html', context)
-    context['reviews'] = reviews
     return render(request, 'mainpage/detail.html', context)
-    # except:
-    #     return HttpResponseNotFound("Not Found")
 
 
 def get_reviews(request, id):
@@ -114,3 +112,18 @@ def get_reviews(request, id):
 def get_rating_s(request, id):
     data = Book.objects.filter(id=id)
     return JsonResponse({'average_rate': data[0].average_rating})
+
+
+def add_book(request):
+    if request.user.is_staff:
+        if request.method == 'POST':
+            form = BookForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                return redirect('mainpage/home.html')
+        else:
+            form = BookForm()
+        return render(request, 'mainpage/add_book.html', {'form': form})
+    else:
+        return HttpResponseForbidden('Forbidden')
+
