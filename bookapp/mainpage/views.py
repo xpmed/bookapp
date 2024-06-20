@@ -1,36 +1,37 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
 from django.contrib import auth
-from django.template.loader import render_to_string
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import HttpResponseForbidden, JsonResponse
+from django.db.models import Q
 
 from .models import Book, Category, Review
-from django.http import JsonResponse
-from django.db.models import Q
-from django.http import HttpResponse, HttpResponseNotFound
 from .forms import BookForm
-from django.template.context_processors import csrf
+
 from decimal import Decimal
-from django.http import HttpResponseForbidden
 
 
-def home(request):
-    books = Book.objects.all()
+def home(request, page=1):
+    books = Book.objects.all().order_by('title')
     categories = Category.objects.all()
-    context = {
-        'books': books,
-        'categories': categories,
-    }
+    context = {}
     if 'search_button' in request.POST:
         search = request.POST.get('search_value')
         searched_books = books.filter(Q(title__contains=search) | Q(author__name__contains=search) | Q(author__surname__contains=search) | Q(category__category=search))
         context['books'] = searched_books
         context['searched'] = search
-    if request.user.is_authenticated:
-        context['userStatus'] = 'logged in'
     else:
-        context['userStatus'] = 'not logged in'
+        paginator = Paginator(books, 3)
+        page = request.GET.get('page')
+        try:
+            books = paginator.page(page)
+        except PageNotAnInteger:
+            books = paginator.page(1)
+        except EmptyPage:
+            books = paginator.page(paginator.num_pages)
+        context['books'] = books
+    context['categories'] = categories
     return render(request, 'mainpage/home.html', context)
 
 
@@ -60,7 +61,7 @@ def login_page(request):
             auth.login(request, user)
             return redirect('home_page')
         else:
-            context['error'] = 'Password or username are incorrect! try again.'
+            context['error'] = 'Password or username are incorrect! Try again.'
             return render(request, 'mainpage/login.html', context)
     else:
         return render(request, 'mainpage/login.html')
@@ -120,7 +121,7 @@ def add_book(request):
             form = BookForm(request.POST, request.FILES)
             if form.is_valid():
                 form.save()
-                return redirect('mainpage/home.html')
+                return redirect('home_page')
         else:
             form = BookForm()
         return render(request, 'mainpage/add_book.html', {'form': form})

@@ -98,6 +98,7 @@
                     success: function(response) {
                         $('#myForm')[0].reset();
                         $('#myForm').addClass('hidden');
+                        $('#no_reviews').addClass('hidden');
                         $('#new_review').removeClass('hidden');
                         $("#new_rate").text(rateValue);
                         $("#new_content").text(contentValue);
@@ -127,7 +128,7 @@
             <ul class="list-group shadow">
                 <li class="list-group-item">
                     <div class="media align-items-lg-center flex-column flex-lg-row p-3">
-                        {% if book.cover %}
+                        {% if obj.cover %}
                             <img src="{{ obj.cover.url }}" alt="{{ obj.title }}" width="300" class="ml-lg-5 order-1 order-lg-2">
                         {% else %}
                             <img src="" alt="{{ obj.title }}" width="200" class="ml-lg-5 order-1 order-lg-2">
@@ -215,7 +216,7 @@
                     <li class="list-group-item">
                         <div class="media align-items-lg-center">
                             <div class="media-body order-2 order-lg-1">
-                                <h5 class="mt-0 font-weight-bold mb-2">No reviews yet.</h5>
+                                <h5 id="no_reviews" class="mt-0 font-weight-bold mb-2">No reviews yet.</h5>
                             </div>
                         </div>
                     </li>

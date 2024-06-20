@@ -4,6 +4,38 @@
     <meta charset="UTF-8">
     <title>BookApp</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .pagination-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 20px;
+        }
+
+        .pagination {
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .pagination a, .pagination span {
+            padding: 5px 10px;
+            margin: 0 2px;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .pagination a:hover {
+            background-color: #ddd;
+        }
+
+        .pagination .current {
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid #4CAF50;
+        }
+    </style>
 </head>
 <body>
     {% extends 'mainpage/base.html' %}
@@ -43,28 +75,28 @@
         }
     </script>
     <form action="" method="post">
-    {% csrf_token %}
-    <div class="d-flex align-items-center col-lg-8 mx-auto p-3 mb-3">
-         <div class="dropdown mr-3">
-            <button class="btn btn-secondary dropdown-toggle" style="background-color:#28a745;" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Search Category
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                {% for c in categories %}
-                    <span class="dropdown-item" onclick="selectCategory('{{ c }}')">{{ c }}</span>
-                {% endfor %}
+        {% csrf_token %}
+        <div class="d-flex align-items-center col-lg-8 mx-auto p-3 mb-3">
+             <div class="dropdown mr-3">
+                <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Search Category
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {% for c in categories %}
+                        <span class="dropdown-item" onclick="selectCategory('{{ c }}')">{{ c }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="input-group me-3">
+                <input class="form-control border-end-0 border rounded-pill mr-2" type="text" placeholder="Search" value="{{ searched }}" id="example-search-input"  name="search_value">
+                <span class="input-group-append">
+                    <button class="btn btn-outline-secondary bg-white border-start-0 border rounded-pill ms-n3" type="submit" name="search_button" value="search" id="search_button">
+                        <i class="fa fa-search text-success"></i>
+                    </button>
+                </span>
             </div>
         </div>
-        <div class="input-group me-3">
-            <input class="form-control border-end-0 border rounded-pill mr-2" type="text" placeholder="Search" value="{{ searched }}" id="example-search-input"  name="search_value">
-            <span class="input-group-append">
-                <button class="btn btn-outline-secondary bg-white border-start-0 border rounded-pill ms-n3" type="submit" name="search_button" value="search" id="search_button">
-                    <i class="fa fa-search text-success"></i>
-                </button>
-            </span>
-        </div>
-    </div>
-</form>
+    </form>
 
     <div class="row">
         {% for book in books %}
@@ -95,6 +127,26 @@
                 </ul>
             </div>
         {% endfor %}
+    </div>
+    <div class="pagination-container">
+    <div class="pagination">
+        {% if books.has_previous %}
+            <a href="?page=1">&laquo; First one</a>
+            <a href="?page={{ books.previous_page_number }}">&lsaquo; Previous one</a>
+        {% endif %}
+
+        {% for num in books.paginator.page_range %}
+            {% if books.number == num %}
+                <span class="current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if books.has_next %}
+            <a href="?page={{ books.next_page_number }}">Next one &rsaquo;</a>
+            <a href="?page={{ books.paginator.num_pages }}">Last one &raquo;</a>
+        {% endif %}
     </div>
 </div>
     {% endblock %}

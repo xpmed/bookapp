@@ -40,17 +40,14 @@
          <div class="col-lg-8 mx-auto mb-5">
             <ul class="list-group shadow">
                 <li class="list-group-item">
-                    <div class="container">
-        <div class="form-container">
-            <h2>Add a book</h2>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.as_p }} <!-- Wyświetl formularz używając as_p dla prostego układu wierszowy -->
-                <button type="submit" class="btn btn-primary">Dodaj książkę</button>
-            </form>
-        </div>
-    </div>
-
+                    <div class="form-container">
+                        <h2>Add a book</h2>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </form>
+                    </div>
                 </li>
             </ul>
          </div>

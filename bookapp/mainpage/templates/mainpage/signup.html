@@ -3,28 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <title>SignUp</title>
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+        }
+        .form-container .form-group {
+            margin-bottom: 20px;
+        }
+        .form-container input[type="text"],
+        .form-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .form-container input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
     {% extends 'mainpage/base.html' %}
     {% block content %}
-    <div class="container">
-        <h2>SIGNUP</h2><br>
-        {% if error %}
-            <div class="alert alert-danger">
-                {{ error }}<br>
-            </div>
-        {% endif %}
-        <form method="POST">
-            {% csrf_token %}
-            Username:<br>
-            <input type="text" name="username"><br><br>
-            Password:<br>
-            <input type="password" name="pass1"><br><br>
-            Confirm password:<br>
-            <input type="password" name="pass2"><br><br>
-            <input class="btn btn-primary" type="submit" value="Sign up">
-        </form>
-    </div>
+    <div class="col-lg-8 mx-auto mb-5">
+        <ul class="list-group shadow">
+            <li class="list-group-item">
+                <div class="container">
+                    {% if error %}
+                        <div class="alert alert-danger">
+                            {{ error }}<br>
+                        </div>
+                    {% endif %}
+                    <div class="form-container">
+                        <h2>SIGNUP</h2><br>
+                        <form method="POST">
+                            {% csrf_token %}
+                            Username:<br>
+                            <input type="text" name="username"><br><br>
+                            Password:<br>
+                            <input type="password" name="pass1"><br><br>
+                            Confirm password:<br>
+                            <input type="password" name="pass2"><br><br>
+                            <input class="btn btn-success" type="submit" value="Sign up">
+                        </form>
+                    </div>
+                </div>
+            </li>
+        </ul>
+     </div>
     {% endblock %}
 </body>
 </html>
