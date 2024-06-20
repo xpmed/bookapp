@@ -26,3 +26,15 @@ Dodatkowe Funkcje
 
     Funkcjonalność Wyszukiwania:
         -Umożliwia użytkownikom wyszukiwanie książek po tytule lub autorze, co zwiększa użyteczność aplikacji.
+
+Przykładowi użytkownicy:
+
+    username: Dominika
+    password: 12345
+
+    username: Jarek
+    password: 963258
+
+    username: Dawid
+    password: 12345
+    posiada status "w zespole" - może dodawać nowe książki
