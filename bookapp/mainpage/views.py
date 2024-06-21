@@ -5,6 +5,7 @@ from django.contrib import auth
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseForbidden, JsonResponse
 from django.db.models import Q
+from django.db.models import Sum
 
 from .models import Book, Category, Review
 from .forms import BookForm
@@ -78,6 +79,7 @@ def get_raiting(request):
     data = list(Book.objects.values())
     return JsonResponse({'data': list(data)})
 
+
 def detail_view(request, id):
     context = {}
     obj = Book.objects.filter(id=id)
@@ -94,8 +96,8 @@ def detail_view(request, id):
             author=request.user,
         )
         if obj[0].average_rating:
-            latest_rate = obj[0].average_rating
-            av_rate = (latest_rate + Decimal(rate)) / 2
+            all_rates = reviews.aggregate(Sum('raiting'))['raiting__sum']
+            av_rate = all_rates / len(reviews)
         else:
             av_rate = rate
         obj.update(average_rating=av_rate)
